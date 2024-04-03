@@ -52,6 +52,7 @@ void NamespaceListAllocator::free(LinkedListEntry<android_namespace_t> *entry) {
 
 static android_namespace_t *getDefaultNamespace() {
     //解析linker64
+    LOGE("use default namespace this is temp code it's only working in android 12 ");
     const ElfModule &aModule = ProcessRuntime::GetTargetElfModule("linker64");
 //    ElfReader()
     if (aModule.address != nullptr) {
@@ -93,6 +94,18 @@ soinfo *find_containing_library(const void *p) {
                 return si;
             }
         }
+    }
+    //if can't find namespace we use main caller namespace
+    char cmdline[1024];
+    ProcessRuntime::GetCmdlineForPid(getpid(), cmdline, sizeof(cmdline));
+    for (auto it = solist.begin(); it != solist.end(); it++) {
+        soinfo *si = static_cast<struct soinfo *>(*it);
+        //判断路径里是否包含cmdline
+        if (strstr(si->get_realpath(), cmdline) != nullptr) {
+            LOGI(" find_containing_library %s ", si->get_realpath());
+            return si;
+        }
+
     }
     return nullptr;
 }

@@ -101,3 +101,27 @@ ElfModule ProcessRuntime::GetTargetElfModule(const char *soName) {
     }
     return elfModule;
 }
+
+void ProcessRuntime::GetCmdlineForPid(int pid, char *cmdlineBuffer, size_t bufferSize) {
+    char path[256];
+    FILE *fp;
+
+    // 构造文件路径 /proc/[pid]/cmdline
+    sprintf(path, "/proc/%d/cmdline", pid);
+
+    // 尝试打开文件
+    fp = fopen(path, "r");
+    if (fp == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    // 尝试读取cmdline文件的内容
+    if (fgets(cmdlineBuffer, bufferSize, fp) == NULL) {
+        fprintf(stderr, "Failed to read cmdline for PID %d\n", pid);
+    }
+
+    // 关闭文件
+    fclose(fp);
+}
+

@@ -16,6 +16,8 @@ class ProcessRuntime {
 
 public:
     static ElfModule GetTargetElfModule(const char* soName);
+    static void GetCmdlineForPid(int pid, char *cmdlineBuffer, size_t bufferSize);
+
 };
 
 
